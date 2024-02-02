@@ -14,7 +14,7 @@ The resulting specification is generic enough to work not only for scientific do
 A *cardboard bundle* is a directory of the following structure:
 
 - `pdfs`: A directory of non-cardboard references.
-- `cardboards`: A directory of *cardboards*, containing all referenced cardboards and the entrypoint to this cardboard (defined later).
+- `cardboards`: A directory of *cardboards*.
 
 The `pdfs` directory contains legacy papers that any cardboard in the cardboard bundle cites directly. Each file in the `pdf` directory must be a pdf named `<digest>.pdf`, where `<digest>` is the lowercase-base-16 encoding of the sha256 hash of the pdf. This serves to deduplicate papers if they get cited by several cardboards in the same bundle.
 
@@ -22,21 +22,22 @@ The `cardboards` directory contains individual cardboards. Each *cardboard* is i
 
 The `cardboard.json` file supplies metadata about a cardboard. It must contain a single json object with the following fields (mandatory unless explicitly stated otherwise):
 
-- `title`: A string, a human-readable title of the cardboard.
+- `title`: A string, the human-readable title of the cardboard.
 - `date`: A string giving the publication date of the cardboard as `YYYY-MM-DD`.
 - `authors`: An array of strings, the authors of the cardboard. Use the empty array for anonymous authorship.
 - `cardboards`: An array of dependency cardboard ids as strings. Each of these must be a directory in the `cardboards` directory. The array should contain no duplicates.
 - `pdfs`: An array of dependency pdf names strings. Each of these must be a file in the `pdfs` directory. The array should contain no duplicates.
+- Optionally, an arbitrary number of additional fields.
 
-The object may contain arbitrary additional fields.
+The `index.html` file is the entrypoint for viewing a cardboard. This file, and all other web technology files referenced from it, should assume that the root of the webserver seving it is one directory further up. For example, an absolute link from `index.html` file to itself would be `/<CardboardId>/index.html`. The entry point of other cardboards can hence be linkted to via `/<OtherCardboardId>/index.html`. It is perfectly fine to use relative links as well, or to link to resources other than the `index.html` of a cardboard.
 
-The `index.html` file is the entrypoint for viewing a cardboard. This file, and all other web technology files referenced from it, should assume that the root of the webserver seving it is one directory up. For example, an absolute link from `index.html` file to itself would be `/<CardboardId>/index.html`. The entry point of other cardboards can hence be linkted to via `/<OtherCardboardId>/index.html`. It is perfectly fine to use relative links as well, or to link to resources other than the `index.html` of a cardboard.
+That's it.
 
 ## Design Rationale
 
 To have even the slightest chance of wider adoption, the specification has to be as simple as possible. That is why the feature set is the absolute bare minimum of what you need to switch from pdf to web technologies, to allow for self-contained bundling of all dependencies, and to ensure that bundles can be moved anywhere and read locally.
 
-We expect individuals to keep a bundle of all the interesting cardboards they know of, including their own. When finding a new interesting bundle, it can simply be merged in by copying the contents of the `pdfs` and `cardboards` directories. If cardboard ids and sha256 digests uniquely identify their resources, than one can simply overwrite or ignore any duplicates.
+We expect individuals to keep a bundle of all the interesting cardboards they know of, including their own. When finding a new interesting bundle, it can simply be merged in by copying the contents of the `pdfs` and `cardboards` directories. If cardboard ids and sha256 digests uniquely identify their resources, then one can simply overwrite or ignore any duplicates.
 
 For publishing a particular cardboard, you can create a minimal complete bundle by starting with the cardboard to publish, add all its dependency pdfs, and then recursively add all its dependency cardboards. The resulting bundle can be hosted on the web, and you then link to the `index.html` of the entrypoint cardboard.
 
@@ -50,7 +51,7 @@ We can imagine several additional, useful features, that could be facilitated by
 - Conventions for storing tooltips that could be loaded from other cardboards, similar to Wikipedia link previews.
 - A canonic way for publishing newer versions of a cardboard, to allow for checking whether one reads an obsolete document.
 - A canonic way for authors to list all their cardboards, to allow for discovery mechanisms.
-- A canonic way for authors to offer peer-reviewing-like evaluation of other cardboards.
+- A canonic way for authors to share peer-reviewing-like evaluation of other cardboards.
 - etc etc etc
 
 Such conventions are out of scope of the bare cardboard specification. It is up to those who wish to push these conventions forward to coordinate, specify, and promote them.
